@@ -1,4 +1,5 @@
 require_relative '../test_prerequisites'
+require_relative '../test_helpers'
 
 class RackUsageMonitoringTest < Minitest::Test
   def test_that_RackUsageMonitoring_accessible_when_middleware_required
@@ -17,7 +18,7 @@ class RackUsageMonitoringTest < Minitest::Test
 
   def test_that_RackUsageMonitoring_usage_data_returns_UsageDataProtected_when_middleware_called_before
     env = Hash.new
-    middleware = RackUsageMonitoring::Middleware.new
+    middleware = RackUsageMonitoring::Middleware.new(Helpers.endware_that_responds_to_call)
     middleware.call(env)
 
     usage_data_protected = RackUsageMonitoring.usage_data(env)

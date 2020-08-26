@@ -27,13 +27,34 @@ module RackUsageMonitoring
     def http_methods
       RackUsageTracking::TrackerHttpMethod.new
     end
-    def accepted_languages; end
-    def accepted_encodings; end
-    def paths; end
-    def query_strings; end
-    def routes; end
-    def http_versions; end
-    def parameters; end
+
+    def accepted_languages
+      RackUsageTracking::TrackerAcceptedLanguage.new
+    end
+
+    def accepted_encodings
+      RackUsageTracking::TrackerAcceptedEncoding.new
+    end
+
+    def paths
+      RackUsageTracking::TrackerPath.new
+    end
+
+    def query_strings
+      RackUsageTracking::TrackerQueryString.new
+    end
+
+    def routes
+      RackUsageTracking::TrackerRoute.new
+    end
+
+    def http_versions
+      RackUsageTracking::TrackerHttpVersion.new
+    end
+
+    def parameters
+      RackUsageTracking::TrackerQueryParameter.new
+    end
   end
 
   def self.usage_data(env)
@@ -41,12 +62,15 @@ module RackUsageMonitoring
   end
 
   class Middleware
-    def initialize
+    def initialize(superseeding_rack_application)
       @usage_data = UsageData.new
+      @superseeding_rack_application = superseeding_rack_application
     end
 
     def call(env)
       env[Constants::KEY_USAGE_DATA_PROTECTED] = UsageDataProtected.new
+
+      @superseeding_rack_application.call(env)
     end
   end
 end
