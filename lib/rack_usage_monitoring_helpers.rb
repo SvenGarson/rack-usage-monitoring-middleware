@@ -21,32 +21,40 @@
   end
 
   class QueryParameter
+
     def initialize(key_value_string)
-      if key_value_string.count('=') == 1
-        self.key = key_value_string.split('=', 2).first
-        self.value = key_value_string.split('=', 2).last
-      else
-        self.key = ''
-        self.value = ''
-      end
+      parameter_key, parameter_value = determine_key_and_value(key_value_string)
+
+      self.key = parameter_key
+      self.value = parameter_value
     end
 
     def self.parse_query_string(query_string)
       query_string = strip_leading_question_mark(query_string)
-      query_string.split('&', -1)
+      query_string.split('&', -1).map do |key_value_string|
+        QueryParameter.new(key_value_string)
+      end
     end
 
     def key
-      @key
+      @key.dup
     end
 
     def value
-      @value
+      @value.dup
     end
 
     private
 
     attr_writer(:key, :value)
+
+    def determine_key_and_value(key_value_string)
+      if key_value_string.count('=') == 1
+        key_value_string.split('=', 2)
+      else
+        ['', '']
+      end
+    end
 
     def self.strip_leading_question_mark(string)
       if string.start_with?('?')

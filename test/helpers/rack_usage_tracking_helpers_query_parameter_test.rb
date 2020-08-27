@@ -6,12 +6,12 @@ class RackUsageTrackingHelpersQueryParameterTest < Minitest::Test
     assert(defined?(RackUsageTrackingHelpers::QueryParameter))
   end
 
-  # ::new
+  # new
   def test_that_RackUsageTrackingHelpers_QueryParameter_new_takes_single_string_argument
     assert_instance_of(RackUsageTrackingHelpers::QueryParameter, RackUsageTrackingHelpers::QueryParameter.new(String.new))
   end
 
-  # #key
+  # key
   def test_that_RackUsageTrackingHelpers_QueryParameter_responds_to_key
     assert_respond_to(RackUsageTrackingHelpers::QueryParameter.new(String.new), :key)
   end
@@ -110,7 +110,37 @@ class RackUsageTrackingHelpersQueryParameterTest < Minitest::Test
     refute_same(query_parameter, query_parameter_dup)
   end
 
-  # dupping tests -> no leaking !!! ???
+  def test_that_RackUsageTrackingHelpers_QueryParameter_dup_matches_original_key_and_value
+    query_parameter = RackUsageTrackingHelpers::QueryParameter.new('color=magenta')
+    query_parameter_dup = query_parameter.dup
+
+    assert_equal(query_parameter.key, query_parameter_dup.key)
+    assert_equal(query_parameter.value, query_parameter_dup.value)
+  end
+
+  def test_that_RackUsageTrackingHelpers_QueryParameter_key_cannot_be_used_to_change_internal_key_string
+    query_parameter = RackUsageTrackingHelpers::QueryParameter.new('color=blue')
+    first_key = query_parameter.key
+
+    first_key.replace('brand')  
+
+    second_key = query_parameter.key
+
+    assert_equal('brand', first_key)
+    refute_equal('brand', second_key)
+  end
+
+  def test_that_RackUsageTrackingHelpers_QueryParameter_value_cannot_be_used_to_change_internal_value_string
+    query_parameter = RackUsageTrackingHelpers::QueryParameter.new('color=blue')
+    first_value = query_parameter.value
+
+    first_value.replace('light-blue')  
+
+    second_value = query_parameter.value
+
+    assert_equal('light-blue', first_value)
+    refute_equal('light-blue', second_value)
+  end
 
   # ::parse_query_string
   def test_that_RackUsageTrackingHelpers_QueryParameter_responds_to_parse_query_string
@@ -119,6 +149,14 @@ class RackUsageTrackingHelpersQueryParameterTest < Minitest::Test
 
   def test_that_RackUsageTrackingHelpers_QueryParameter_parse_query_string_takes_single_string_argument
     assert_instance_of(Array, RackUsageTrackingHelpers::QueryParameter.parse_query_string(String.new))
+  end
+
+  def test_that_RackUsageTrackingHelpers_QueryParameter_parse_query_string_returns_array_of_QueryParameter_instances
+    query_parameter_list = RackUsageTrackingHelpers::QueryParameter.parse_query_string('?menu=pizza&drink=water')
+
+    query_parameter_list.each do |query_parameter|
+      assert_instance_of(RackUsageTrackingHelpers::QueryParameter, query_parameter)
+    end
   end
 
   def test_that_RackUsageTrackingHelpers_QueryParameter_parse_query_string_returns_correct_number_of_query_parameters
@@ -147,24 +185,22 @@ class RackUsageTrackingHelpersQueryParameterTest < Minitest::Test
   end
 
   def test_that_RackUsageTrackingHelpers_QueryParameter_parse_query_string_ignores_leading_question_mark
-    skip
-    query_parameter_list = RackUsageTrackingHelpers::QueryParameter.parse_query_string('?menu=pizza&drink=water')
+    query_parameter_list = RackUsageTrackingHelpers::QueryParameter.parse_query_string('?menu=pizza')
+    query_string_count = query_parameter_list.size 
+    query_parameter = query_parameter_list.first
 
-    query_parameter_list.each do |query_parameter|
-      assert_equal(false, query_parameter.key.start_with?('?'))
-    end
+    assert_equal(1, query_string_count)
+    assert_equal(false, query_parameter.key.start_with?('?'))
   end
 
-  def test_that_RackUsageTrackingHelpers_QueryParameter_returns_correct_string_with_leading_question_mark
-    skip
-    query_parameter = RackUsageTrackingHelpers::QueryParameter.new('?menu=pizza')
-
-    key = query_parameter.key
-
-    assert_equal('menu', key)
+  def test_that_RackUsageTrackingHelpers_QueryParameter_parse_query_string_works_without_leading_question_mark
+    query_parameter_list = RackUsageTrackingHelpers::QueryParameter.parse_query_string('menu=pizza&drink=water')
+    
+    assert_equal('menu',  query_parameter_list.first.key)
+    assert_equal('pizza', query_parameter_list.first.value)
+    assert_equal('drink', query_parameter_list.last.key)
+    assert_equal('water', query_parameter_list.last.value)
   end
-
-  # test_that_RackUsageTrackingHelpers_QueryParameter_parse_query_string
 end
 
 =begin
