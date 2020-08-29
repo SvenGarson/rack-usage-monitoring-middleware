@@ -27,4 +27,12 @@ module Helpers
   def self.endware_that_responds_to_call
     Endware.new
   end
+
+  def self.class_includes_modules(class_name, *modules_to_be_mixed_in)
+    modules_mixed_in_by_class = class_name.included_modules
+
+    modules_to_be_mixed_in.all? do |module_name|
+      modules_mixed_in_by_class.include?(module_name)
+    end
+  end
 end

@@ -1,3 +1,5 @@
+require_relative 'rack_usage_monitoring_attributes'
+
 module RackUsageTracking
   class TrackerRequest; end
   class TrackerHttpMethod; end
