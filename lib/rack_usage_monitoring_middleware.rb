@@ -6,6 +6,10 @@ module RackUsageMonitoring
 
   module Constants
     KEY_USAGE_DATA_PROTECTED = "rack_usage_monitoring.usage_data_protected".to_sym
+    KEY_RACK_ENV = 'RACK_ENV'
+    RACK_ENV_NONE = 'none'
+    RACK_ENV_DEVELOPMENT = 'development'
+    RACK_ENV_DEPLOYMENT = 'deployment'
   end
   Constants.freeze
 
@@ -71,6 +75,10 @@ module RackUsageMonitoring
       env[Constants::KEY_USAGE_DATA_PROTECTED] = UsageDataProtected.new
 
       @superseeding_rack_application.call(env)
+    end
+
+    def self.deployment?
+      ENV[Constants::KEY_RACK_ENV] == Constants::RACK_ENV_DEPLOYMENT
     end
   end
 end

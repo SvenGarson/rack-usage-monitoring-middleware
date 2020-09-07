@@ -1,5 +1,5 @@
 require_relative 'rack_usage_monitoring_helpers'
-require 'date'
+require_relative 'rack_usage_monitoring_utils'
 
 module RackUsageAttributes
   module UpdateableEach
@@ -43,13 +43,20 @@ module RackUsageAttributes
   class AttributeCounterDailyReset < Attribute
     include UpdateableEach
 
-    def initialize(now=nil)
-      self.date_today = now.nil? ? Time.now : now
+    def initialize
+      self.counter_date = RackUsageUtils::OverrideableDate.today
       self.daily_counter = AttributeCounter.new
     end
 
     def update_each(object=nil)
       daily_counter.update
+
+      # reset counter if date changes
+      if RackUsageUtils::OverrideableDate.today != counter_date
+        self.daily_counter = AttributeCounter.new
+        self.counter_date = RackUsageUtils::OverrideableDate.today
+      end
+
       daily_counter.count
     end
 
@@ -59,8 +66,7 @@ module RackUsageAttributes
 
     private
 
-    attr_writer(:date_today, :daily_counter)
-    attr_reader(:daily_counter)
+    attr_writer(:counter_date, :daily_counter)
+    attr_reader(:counter_date, :daily_counter)
   end
-
 end

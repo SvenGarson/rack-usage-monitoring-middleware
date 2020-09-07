@@ -34,4 +34,24 @@ class RackUsageMonitoringMiddlewareTest < Minitest::Test
     middleware_return_value = middleware.call(env)
     assert_equal(superseeding_rack_application.uuid, middleware_return_value)
   end
+
+  def test_that_RackUsageMonitoring_Middleware_responds_to_deployment?
+    assert_equal(true, RackUsageMonitoring::Middleware.respond_to?(:deployment?))
+  end
+
+  def test_that_RackUsageMonitoring_Middleware_deployment_returns_true_when_app_runs_in_deployment_mode
+    ENV[RackUsageMonitoring::Constants::KEY_RACK_ENV] = RackUsageMonitoring::Constants::RACK_ENV_DEPLOYMENT
+
+    assert_equal(true, RackUsageMonitoring::Middleware.deployment?)
+  end
+
+  def test_that_RackUsageMonitoring_Middleware_deployment_returns_false_when_app_runs_in_development_mode
+    ENV[RackUsageMonitoring::Constants::KEY_RACK_ENV] = RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT
+    assert_equal(false, RackUsageMonitoring::Middleware.deployment?)
+  end
+
+  def test_that_RackUsageMonitoring_Middleware_deployment_returns_false_when_app_runs_in_none_mode
+    ENV[RackUsageMonitoring::Constants::KEY_RACK_ENV] = RackUsageMonitoring::Constants::RACK_ENV_NONE
+    assert_equal(false, RackUsageMonitoring::Middleware.deployment?)
+  end
 end

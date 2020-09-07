@@ -1,6 +1,5 @@
 require_relative '../test_prerequisites'
 require_relative '../test_helpers'
-require 'date'
 
 class RackUsageAttributesAttributeCounterDailyResetTest < Minitest::Test
   def test_that_RackUsageAttributes_AttributeCounterDailyReset_accessible_when_middleware_required
@@ -32,8 +31,7 @@ class RackUsageAttributesAttributeCounterDailyResetTest < Minitest::Test
   end
 
   def test_that_RackUsageAttributes_AttributeCounterDailyReset_update_each_returns_correct_integer_count_after_incrementing_the_same_day
-    skip
-    reset_counter = RackUsageAttributes::AttributeCounterDailyReset.new(Date.today)
+    reset_counter = RackUsageAttributes::AttributeCounterDailyReset.new
 
     (1..150).each do |run|
       # first update_each increments zero to one
@@ -45,37 +43,48 @@ class RackUsageAttributesAttributeCounterDailyResetTest < Minitest::Test
   end
 
   def test_that_RackUsageAttributes_AttributeCounterDailyReset_responds_to_today
-    skip
     assert_equal(true, RackUsageAttributes::AttributeCounterDailyReset.new.respond_to?(:today))
   end
 
   def test_that_RackUsageAttributes_AttributeCounterDailyReset_today_returns_correct_integer_count_before_first_update
-    skip
     first_today = RackUsageAttributes::AttributeCounterDailyReset.new.today
 
     assert_equal(0, first_today)
     assert_instance_of(Integer, first_today)
   end
 
-  def test_that_RackUsageAttributes_AttributeCounterDailyReset_today_returns_correct_integer_count_after_first_update
-    skip
-    reset_counter = RackUsageAttributes::AttributeCounterDailyReset.new(today)
+  def test_that_RackUsageAttributes_AttributeCounterDailyReset_today_resets_to_zero_when_date_changes
+    base_date = Date.strptime('21/12/2020', '%d/%m/%Y')
+    RackUsageUtils::OverrideableDate.set_today_date(base_date)
 
-    (1..150).each do |run|
-      reset_counter.update
-      count_today = reset_counter.today
+    reset_counter = RackUsageAttributes::AttributeCounterDailyReset.new
 
-      assert_equal(run, count_today)
-      assert_instance_of(Integer, count_today)
-    end
+    assert_equal(0, reset_counter.today)
+    reset_counter.update
+    assert_equal(1, reset_counter.today)
+
+    RackUsageUtils::OverrideableDate.set_today_date(base_date + 1)    
+    reset_counter.update
+    assert_equal(0, reset_counter.today)
+    reset_counter.update
+    assert_equal(1, reset_counter.today)
   end
 
-=begin
-  - new reset_counter created -> saved time time (can be overriden)
-  - when updated:
-    - now = time now (can be overriden)
-    - if now is different day from when initiallized:
-        - reset count to zero
-    - increment count by 1
-=end
+  def test_that_RackUsageAttributes_AttributeCounterDailyReset_today_resets_to_zero_each_day_for_over_a_year
+    today_date = Date.strptime('21/12/2020', '%d/%m/%Y')
+    RackUsageUtils::OverrideableDate.set_today_date(today_date)
+
+    reset_counter = RackUsageAttributes::AttributeCounterDailyReset.new
+
+    400.times do |_|
+      assert_equal(0, reset_counter.today)
+      reset_counter.update
+      assert_equal(1, reset_counter.today)
+      
+      # go to next day and reset
+      today_date += 1
+      RackUsageUtils::OverrideableDate.set_today_date(today_date)    
+      reset_counter.update
+    end
+  end
 end
