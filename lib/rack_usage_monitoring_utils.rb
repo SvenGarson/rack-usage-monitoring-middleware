@@ -14,7 +14,7 @@ module RackUsageUtils
       date = @@use_date.dup
 
       if RackUsageMonitoring::Middleware.deployment? || date.nil?
-        Date.today
+        Time.now.utc.to_date
       else
         date
       end

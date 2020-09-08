@@ -69,4 +69,26 @@ module RackUsageAttributes
     attr_writer(:counter_date, :daily_counter)
     attr_reader(:counter_date, :daily_counter)
   end
+
+  class AttributeRanking < Attribute
+    include UpdateableEach
+
+    def initialize
+      self.ranking_set = Set.new
+    end
+
+    def update_each(object=nil)
+      ranking_set << object
+
+      object
+    end
+
+    def has_ranking?
+      !ranking_set.empty?
+    end
+
+    private
+
+    attr_accessor(:ranking_set)
+  end
 end

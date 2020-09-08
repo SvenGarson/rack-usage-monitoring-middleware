@@ -8,6 +8,29 @@
       self.minor = major_minor_array.last
     end
 
+    def <=>(other)
+      return nil unless other.instance_of?(self.class)
+
+      self_version_sum = unique_major_minor_sum
+      other_version_sum = other.unique_major_minor_sum
+
+      if self_version_sum < other_version_sum
+        -1
+      elsif self_version_sum > other_version_sum
+        1
+      else
+        0
+      end
+    end
+
+    def hash
+      unique_major_minor_sum
+    end
+
+    def eql?(other)
+      hash == other.hash
+    end
+
     private
 
     def determine_major_minor(http_version_string)
@@ -18,6 +41,12 @@
     end
 
     attr_writer(:major, :minor)
+
+    protected
+
+    def unique_major_minor_sum
+      (major * 10) + minor
+    end
   end
 
   class QueryParameter
