@@ -87,6 +87,18 @@ module RackUsageAttributes
       !ranking_set.empty?
     end
 
+    def lowest
+      ranking_set.min
+    end
+
+    def highest
+      ranking_set.max
+    end
+
+    def all
+      []
+    end
+
     private
 
     attr_accessor(:ranking_set)

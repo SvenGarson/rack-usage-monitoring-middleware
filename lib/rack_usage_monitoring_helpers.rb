@@ -31,6 +31,10 @@
       hash == other.hash
     end
 
+    def ==(other)
+      eql?(other)
+    end
+
     private
 
     def determine_major_minor(http_version_string)
