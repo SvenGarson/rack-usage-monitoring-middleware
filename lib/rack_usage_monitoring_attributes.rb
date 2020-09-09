@@ -88,19 +88,41 @@ module RackUsageAttributes
     end
 
     def lowest
-      ranking_set.min
+      ranking_set.min.dup
     end
 
     def highest
-      ranking_set.max
+      ranking_set.max.dup
     end
 
     def all
-      []
+      ranking_set.to_a.map(&:dup)
     end
 
     private
 
     attr_accessor(:ranking_set)
+  end
+
+  class AttributeNumberAverage < Attribute
+    include UpdateableEach
+
+    def initialize
+      @running_sum = 0.0
+      @running_count = 0
+    end
+
+    def update_each(object=nil)
+      @running_count += 1
+      @running_sum += object.to_f
+    end
+
+    def average
+      if @running_count == 0
+        0.0
+      else
+        @running_sum / @running_count.to_f
+      end
+    end
   end
 end

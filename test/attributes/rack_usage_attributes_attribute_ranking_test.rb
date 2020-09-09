@@ -86,8 +86,11 @@ class RackUsageAttributesAttributeRankingTest < Minitest::Test
     ranking.update(http_version_0_9)
     ranking.update(http_version_1_0)
 
+    lowest = ranking.lowest
+
     assert_equal(true, ranking.has_ranking?)
-    assert_equal(http_version_0_9, ranking.lowest) 
+    assert_instance_of(RackUsageTrackingHelpers::HttpVersion, lowest)
+    assert_equal(http_version_0_9, lowest) 
   end
 
   def test_that_RackUsageAttributes_AttributeRanking_lowest_returns_dupped_lowest_ranking_object_when_has_ranking_returns_true
@@ -133,8 +136,11 @@ class RackUsageAttributesAttributeRankingTest < Minitest::Test
     ranking.update(http_version_2_0)
     ranking.update(http_version_1_0)
 
+    highest = ranking.highest
+
     assert_equal(true, ranking.has_ranking?)
-    assert_equal(http_version_2_0, ranking.highest) 
+    assert_instance_of(RackUsageTrackingHelpers::HttpVersion, highest)
+    assert_equal(http_version_2_0, highest) 
   end
 
   def test_that_RackUsageAttributes_AttributeRanking_highest_returns_dupped_highest_ranking_object_when_has_ranking_returns_true
@@ -163,11 +169,26 @@ class RackUsageAttributesAttributeRankingTest < Minitest::Test
   def test_that_RackUsageAttributes_AttributeRanking_all_returns_empty_array_when_has_ranking_returns_false
     ranking = RackUsageAttributes::AttributeRanking.new
 
+    ranking_all = ranking.all
+
     assert_equal(false, ranking.has_ranking?)
-    assert_equal(0, ranking.all.size)
+    assert_equal(0, ranking_all.size)
+    assert_instance_of(Array, ranking_all)
   end
 
-   def test_that_RackUsageAttributes_AttributeRanking_all_returns_array_of_HttpVersion_objects_when_has_ranking_returns_true
+  def test_that_RackUsageAttributes_AttributeRanking_all_returns_array_with_single_HttpVersion_object_when_has_ranking_returns_true
+    ranking = RackUsageAttributes::AttributeRanking.new
+
+    ranking.update(RackUsageTrackingHelpers::HttpVersion.new('HTTP/0.9'))
+
+    ranking_all = ranking.all
+
+    assert_equal(true, ranking.has_ranking?)
+    assert_equal(1, ranking_all.size)
+    assert_instance_of(Array, ranking_all)
+  end
+
+  def test_that_RackUsageAttributes_AttributeRanking_all_returns_array_of_HttpVersion_objects_when_has_ranking_returns_true
     ranking = RackUsageAttributes::AttributeRanking.new
 
     http_version_0_9 = RackUsageTrackingHelpers::HttpVersion.new('HTTP/0.9')
@@ -183,18 +204,73 @@ class RackUsageAttributesAttributeRankingTest < Minitest::Test
     ranking_all = ranking.all
 
     assert_equal(true, ranking.has_ranking?)
-
     ranking_all.each { |http_version| assert_instance_of(RackUsageTrackingHelpers::HttpVersion, http_version, "Object must be instance of HttpVersion") }
-    #assert_equal(4, ranking.all.size)
   end
 
-=begin
-  break these test apart of leave group them togeter?
-  Broken apart into parts like for instance:
-    - #all has correct count
-    - #all returns array of objects that instances of HttpVersion
-    - #all returns array without duplicated
-    - #update does NOT add HttpVersion duplicates
-    - #update DOES add when HttpVersion NOT duplicate
-=end
+  def test_that_RackUsageAttributes_AttributeRanking_all_returns_array_of_HttpVersion_objects_of_correct_size_when_has_ranking_returns_true
+    ranking = RackUsageAttributes::AttributeRanking.new
+
+    http_version_0_9 = RackUsageTrackingHelpers::HttpVersion.new('HTTP/0.9')
+    http_version_1_0 = RackUsageTrackingHelpers::HttpVersion.new('HTTP/1.0')
+    http_version_1_1 = RackUsageTrackingHelpers::HttpVersion.new('HTTP/1.1')
+    http_version_2_0 = RackUsageTrackingHelpers::HttpVersion.new('HTTP/2.0')
+
+    ranking.update(http_version_1_1)
+    ranking.update(http_version_0_9)
+    ranking.update(http_version_2_0)
+    ranking.update(http_version_1_0)
+
+    ranking_all = ranking.all
+
+    assert_equal(true, ranking.has_ranking?)
+    assert_equal(4, ranking_all.size)
+  end
+
+  def test_that_RackUsageAttributes_AttributeRanking_all_returns_array_with_all_added_HttpVersion_objects
+    ranking = RackUsageAttributes::AttributeRanking.new
+
+    http_version_0_9 = RackUsageTrackingHelpers::HttpVersion.new('HTTP/0.9')
+    http_version_1_0 = RackUsageTrackingHelpers::HttpVersion.new('HTTP/1.0')
+    http_version_1_1 = RackUsageTrackingHelpers::HttpVersion.new('HTTP/1.1')
+    http_version_2_0 = RackUsageTrackingHelpers::HttpVersion.new('HTTP/2.0')
+
+    ranking.update(http_version_0_9)
+    ranking.update(http_version_1_0)
+    ranking.update(http_version_1_1)
+    ranking.update(http_version_2_0)
+
+    ranking_all = ranking.all
+
+    assert_includes(ranking_all, http_version_0_9)
+    assert_includes(ranking_all, http_version_1_0)
+    assert_includes(ranking_all, http_version_1_1)
+    assert_includes(ranking_all, http_version_2_0)
+  end
+
+  def test_that_RackUsageAttributes_AttributeRanking_update_does_not_add_duplicate_HttpVersion_objects
+    ranking = RackUsageAttributes::AttributeRanking.new
+
+    http_version_0_9 = RackUsageTrackingHelpers::HttpVersion.new('HTTP/0.9')
+    http_version_2_0 = RackUsageTrackingHelpers::HttpVersion.new('HTTP/2.0')
+
+    ranking.update(http_version_0_9)
+    ranking.update(http_version_0_9)
+    ranking.update(http_version_0_9)
+
+    ranking.update(http_version_2_0)
+    ranking.update(http_version_2_0)
+    ranking.update(http_version_2_0)
+
+    ranking.update(http_version_0_9)
+    ranking.update(http_version_0_9)
+
+    ranking_all = ranking.all
+
+    assert_includes(ranking_all, http_version_0_9, "Does not include HttpVersion object for HTTP/0.9")
+    assert_includes(ranking_all, http_version_2_0, "Does not include HttpVersion object for HTTP/2.0")
+    assert(ranking_all.size > 0)
+    assert_equal(2, ranking_all.size, "Contains duplicate objects")
+    assert_equal(1, ranking_all.count(http_version_0_9), "Contains duplicate of HTTP/0.9")
+    assert_equal(1, ranking_all.count(http_version_2_0), "Contains duplicate of HTTP/2.0")
+  end
 end
