@@ -108,21 +108,49 @@ module RackUsageAttributes
     include UpdateableEach
 
     def initialize
-      @running_sum = 0.0
-      @running_count = 0
+      self.running_sum = 0.0
+      self.running_count = 0
     end
 
     def update_each(object=nil)
-      @running_count += 1
-      @running_sum += object.to_f
+      self.running_count += 1
+      self.running_sum += object.to_f
     end
 
     def average
-      if @running_count == 0
+      if running_count == 0
         0.0
       else
-        @running_sum / @running_count.to_f
+        running_sum / running_count.to_f
       end
+    end
+
+    private
+
+    attr_accessor(:running_sum, :running_count)
+  end
+
+  class AttributeFrequency < Attribute
+    include UpdateableEach
+
+    def initialize
+      @object_count_hash = Hash.new
+    end
+
+    def update_each(object=nil)
+      if @object_count_hash.has_key?(object)
+        @object_count_hash[object] += 1
+      else
+        @object_count_hash[object] = 1
+      end
+
+      object
+    end
+
+    def least_frequent
+      lowest_count = @object_count_hash.values.min
+
+      @object_count_hash.select{ |_, count| count == lowest_count }.keys
     end
   end
 end

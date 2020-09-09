@@ -32,5 +32,10 @@ task(:test_utils) do
   end
 end
 
+desc('Run current test-suit')
+task(:test_current) do
+  system("RACK_ENV=#{RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT} bundle exec ruby test/attributes/rack_usage_attributes_attribute_frequency_test.rb")
+end
+
 desc('Run all tests')
 task :test_all => [:test_middle, :test_helper, :test_attribs, :test_utils] do; end

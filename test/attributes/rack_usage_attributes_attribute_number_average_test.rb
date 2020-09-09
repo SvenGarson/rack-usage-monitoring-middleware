@@ -134,11 +134,29 @@ class RackUsageAttributesAttributeNumberAverageTest < Minitest::Test
     assert_equal(expected_average, average_for_array_argument)
   end
 
-=begin
-  #average
-    - check expected average for mixed int and float numbers
-=end
+  def test_that_RackUsageAttributes_AttributeNumberAverage_correct_average_when_updated_with_floats_an_integers
+    numbers_to_average = [1, 1.1, 50, 229, 2.23, 5841, 3.345, 55968, 4.5678, 169999, 5.12345, 175663, 6.9999999]
+    expected_running_sum = 0.0
+    expected_running_count = 0
 
-  # test_that_RackUsageAttributes_AttributeNumberAverage
-  # AttributeNumberAverage
+    numbers_to_average.each do |number|
+      expected_running_sum += number.to_f
+      expected_running_count += 1
+    end
+
+    # generate expected data as it is documented
+    expected_average = expected_running_sum / expected_running_count.to_f
+
+    # attributes can be updated with single objects or an array
+    number_average_for_single_arguments = RackUsageAttributes::AttributeNumberAverage.new
+    numbers_to_average.each { |number| number_average_for_single_arguments.update(number) }
+    average_for_single_arguments = number_average_for_single_arguments.average
+
+    number_average_for_array_argument = RackUsageAttributes::AttributeNumberAverage.new
+    number_average_for_array_argument.update(numbers_to_average)
+    average_for_array_argument = number_average_for_array_argument.average
+
+    assert_equal(expected_average, average_for_single_arguments)
+    assert_equal(expected_average, average_for_array_argument)
+  end
 end
