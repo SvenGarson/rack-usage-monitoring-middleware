@@ -148,9 +148,27 @@ module RackUsageAttributes
     end
 
     def least_frequent
-      lowest_count = @object_count_hash.values.min
+      lowest_frequency = @object_count_hash.values.min
 
-      @object_count_hash.select{ |_, count| count == lowest_count }.keys
+      lowest_frequency_objects_as_hash = @object_count_hash.select do |_, count|
+        count == lowest_frequency
+      end
+
+      lowest_frequency_objects_as_hash.keys.map(&:dup)
+    end
+
+    def most_frequent
+      highest_frequency = @object_count_hash.values.max
+
+      highest_frequency_objects_as_hash = @object_count_hash.select do |_, count|
+        count == highest_frequency
+      end
+
+      highest_frequency_objects_as_hash.keys.map(&:dup)
+    end
+
+    def all
+      @object_count_hash.keys.map(&:dup)
     end
   end
 end
