@@ -171,4 +171,16 @@ module RackUsageAttributes
       @object_count_hash.keys.map(&:dup)
     end
   end
+
+  class AttributeStringLength < Attribute
+    include UpdateableEach
+
+    def update_each(object=nil)
+      object
+    end
+
+    def has_shortest?
+      false
+    end
+  end
 end
