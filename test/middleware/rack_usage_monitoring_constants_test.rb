@@ -54,7 +54,6 @@ class RackUsageMonitoringConstantsTest < Minitest::Test
     assert_equal('deployment', RackUsageMonitoring::Constants::RACK_ENV_DEPLOYMENT)
   end
 
-  # -------------
   def test_that_RackUsageMonitoring_Constants_contains_KEY_RACK_ENV
     assert(defined?(RackUsageMonitoring::Constants::KEY_RACK_ENV))
   end
@@ -66,7 +65,6 @@ class RackUsageMonitoringConstantsTest < Minitest::Test
   def test_that_RackUsageMonitoring_Constants_KEY_RACK_ENV_has_the_correct_value
     assert_equal('RACK_ENV', RackUsageMonitoring::Constants::KEY_RACK_ENV)
   end
-  # ------
 
   def test_that_RackUsageMonitoring_Constants_is_frozen
     assert_equal(true, RackUsageMonitoring::Constants.frozen?)

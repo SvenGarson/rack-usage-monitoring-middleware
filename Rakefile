@@ -32,11 +32,18 @@ task(:test_utils) do
   end
 end
 
+desc('Run tracking tests')
+task(:test_tracking) do
+  Dir.glob('test/tracking/*_test.rb').each do |file_name|
+    # make this absolute and DRY
+    system("RACK_ENV=#{RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT} bundle exec ruby #{file_name}")
+  end
+end
+
 desc('Run current test-suit')
 task(:test_current) do
-  puts "Nothing to run ATM !!!"
-  #system("RACK_ENV=#{RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT} bundle exec ruby test/attributes/rack_usage_attributes_attribute_string_length_test.rb")
+  system("RACK_ENV=#{RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT} bundle exec ruby test/tracking/rack_usage_tracking_tracker_test.rb")
 end
 
 desc('Run all tests')
-task :test_all => [:test_middle, :test_helper, :test_attribs, :test_utils] do; end
+task :test_all => [:test_middle, :test_helper, :test_attribs, :test_utils, :test_tracking] do; end
