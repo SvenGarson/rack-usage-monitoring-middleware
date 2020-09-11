@@ -134,23 +134,23 @@ module RackUsageAttributes
     include UpdateableEach
 
     def initialize
-      @object_count_hash = Hash.new
+      self.object_count_hash = Hash.new
     end
 
     def update_each(object=nil)
-      if @object_count_hash.has_key?(object)
-        @object_count_hash[object] += 1
+      if object_count_hash.has_key?(object)
+        object_count_hash[object] += 1
       else
-        @object_count_hash[object] = 1
+        object_count_hash[object] = 1
       end
 
       object
     end
 
     def least_frequent
-      lowest_frequency = @object_count_hash.values.min
+      lowest_frequency = object_count_hash.values.min
 
-      lowest_frequency_objects_as_hash = @object_count_hash.select do |_, count|
+      lowest_frequency_objects_as_hash = object_count_hash.select do |_, count|
         count == lowest_frequency
       end
 
@@ -158,9 +158,9 @@ module RackUsageAttributes
     end
 
     def most_frequent
-      highest_frequency = @object_count_hash.values.max
+      highest_frequency = object_count_hash.values.max
 
-      highest_frequency_objects_as_hash = @object_count_hash.select do |_, count|
+      highest_frequency_objects_as_hash = object_count_hash.select do |_, count|
         count == highest_frequency
       end
 
@@ -168,19 +168,74 @@ module RackUsageAttributes
     end
 
     def all
-      @object_count_hash.keys.map(&:dup)
+      object_count_hash.keys.map(&:dup)
     end
+
+    private
+
+    attr_accessor(:object_count_hash)
   end
 
   class AttributeStringLength < Attribute
     include UpdateableEach
 
-    def update_each(object=nil)
-      object
+    def initialize
+      self.shortest_string = nil
+      self.shortest_string_length = max_string_length
+
+      self.longest_string = nil
+      self.longest_string_length = 0
+    end
+
+    def update_each(string=nil)
+      if processable_string?(string)
+        length = string.length
+        
+        if length <= shortest_string_length
+          self.shortest_string_length = length
+          self.shortest_string = string
+        end
+
+        if length >= longest_string_length
+          self.longest_string_length = length
+          self.longest_string = string
+        end
+      end
+
+      string
     end
 
     def has_shortest?
-      false
+      !shortest_string.nil?
+    end
+
+    def shortest
+      shortest_string
+    end
+
+    def has_longest?
+      !longest_string.nil?
+    end
+
+    def longest
+      longest_string
+    end
+
+    private
+
+    attr_accessor(:shortest_string, :shortest_string_length)
+    attr_accessor(:longest_string, :longest_string_length)
+
+    def max_string_length
+      (2**32) - 1
+    end
+
+    def string_length_in_range?(string)
+      (1..max_string_length).cover?(string.length)
+    end
+
+    def processable_string?(string)
+      !string.nil? && string_length_in_range?(string)
     end
   end
 end
