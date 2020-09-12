@@ -15,8 +15,8 @@ module RackUsageTracking
   Constants.freeze
 
   class Tracker
-    def requirements_met?
-
+    def requirements_met?(env)
+      false
     end
   end
 
