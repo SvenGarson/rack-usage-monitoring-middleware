@@ -40,10 +40,13 @@ task(:test_tracking) do
   end
 end
 
-desc('Run current test-suit')
-task(:test_current) do
-  system("RACK_ENV=#{RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT} bundle exec ruby test/tracking/rack_usage_tracking_tracker_test.rb")
+desc('Run test_helpers tests')
+task(:test_test_helpers) do
+  Dir.glob('test/test_helpers/*_test.rb').each do |file_name|
+    # make this absolute and DRY
+    system("RACK_ENV=#{RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT} bundle exec ruby #{file_name}")
+  end
 end
 
 desc('Run all tests')
-task :test_all => [:test_middle, :test_helper, :test_attribs, :test_utils, :test_tracking] do; end
+task :test_all => [:test_middle, :test_helper, :test_attribs, :test_utils, :test_tracking, :test_test_helpers] do; end

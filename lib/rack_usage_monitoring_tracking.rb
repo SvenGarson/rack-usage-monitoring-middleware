@@ -18,6 +18,16 @@ module RackUsageTracking
     def requirements_met?(env)
       false
     end
+
+    def track(env)
+      env
+    end
+  end
+
+  class TrackerRegister
+    def register
+
+    end
   end
 
   class TrackerRequest; end

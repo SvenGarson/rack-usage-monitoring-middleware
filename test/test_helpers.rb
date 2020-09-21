@@ -35,4 +35,36 @@ module Helpers
       modules_mixed_in_by_class.include?(module_name)
     end
   end
+
+  class HashDataPoints
+    attr_reader(:id, :size, :dupped_keys, :dupped_values)
+    attr_reader(:key_ids, :value_ids)
+
+    def initialize(hash)
+      parse_hash_data_points(hash)
+    end
+
+    def ==(other)
+      id            == other.id            &&
+      size          == other.size          &&
+      dupped_keys   == other.dupped_keys   &&
+      dupped_values == other.dupped_values &&
+      key_ids       == other.key_ids       &&
+      value_ids     == other.value_ids
+    end
+
+    private
+
+    def parse_hash_data_points(hash)
+      self.id            = hash.object_id
+      self.size          = hash.size
+      self.dupped_keys   = hash.keys.map(&:dup)
+      self.dupped_values = hash.values.map(&:dup)
+      self.key_ids       = hash.keys.map(&:object_id)
+      self.value_ids     = hash.values.map(&:object_id)
+    end
+
+    attr_writer(:id, :size, :dupped_keys, :dupped_values)
+    attr_writer(:key_ids, :value_ids)
+  end
 end
