@@ -1,6 +1,24 @@
 require 'securerandom'
 
 module Helpers
+  class DummyTracker
+    def initialize(requirements_met:)
+      @requirements_met = requirements_met
+      @track_data_invoked = false
+    end
+
+    def requirements_met?(env)
+      @requirements_met
+    end
+
+    def track_data(env)
+      @track_data_invoked = true
+    end
+
+    def track_data_invoked?
+      @track_data_invoked
+    end
+  end
 
   class EndwareRandomUUID
     attr_reader(:uuid)

@@ -25,12 +25,52 @@ module RackUsageTracking
   end
 
   class TrackerRegister
-    def register
-
+    def initialize
+      self.tracker_name_instance_hash = Hash.new
     end
+
+    def register(tracker_name, tracker_instance)
+      tracker_name_instance_hash[tracker_name] = tracker_instance
+
+      tracker_name
+    end
+
+    def update_all(env)
+      tracker_name_instance_hash.each_pair do |_, tracker|
+        next unless tracker.requirements_met?(env)
+        
+        tracker.track_data(env)
+      end
+
+      env
+    end
+
+    def has_tracker_named?(tracker_name)
+      tracker_name_instance_hash.has_key?(tracker_name)
+    end
+
+    def tracker_named(tracker_name)
+      if tracker_name_instance_hash.has_key?(tracker_name)
+        tracker_name_instance_hash[tracker_name]
+      else
+        nil
+      end
+    end
+
+    private
+
+    attr_accessor(:tracker_name_instance_hash)
   end
 
-  class TrackerRequest; end
+  class TrackerRequest < Tracker
+    def requirements_met?(env)
+      true
+    end
+
+    def track_data(env)
+      true
+    end
+  end
   class TrackerHttpMethod; end
   class TrackerAcceptedLanguage; end
   class TrackerAcceptedEncoding; end

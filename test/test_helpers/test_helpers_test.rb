@@ -78,4 +78,34 @@ class TestHelpersTest < Minitest::Test
 
     assert_equal(false, hashes_identical)
   end
+
+  def test_that_DummyTracker_requirements_met_returns_expected_boolean_passed_to_new
+    some_hash = Hash.new
+    tracker_requirements_met     = Helpers::DummyTracker.new(requirements_met: true)
+    tracker_requirements_not_met = Helpers::DummyTracker.new(requirements_met: false)
+
+    requirements_met = tracker_requirements_met.requirements_met?(some_hash)
+    requirements_not_met = tracker_requirements_not_met.requirements_met?(some_hash)
+
+    assert_equal(true, requirements_met)
+    assert_equal(false, requirements_not_met)
+  end
+
+  def test_that_DummyTracker_track_data_invoked_returns_false_when_track_data_not_yet_invoked
+    tracker_requirements_not_met = Helpers::DummyTracker.new(requirements_met: false)
+
+    track_data_invoked = tracker_requirements_not_met.track_data_invoked?
+
+    assert_equal(false, track_data_invoked)
+  end
+
+  def test_that_DummyTracker_track_data_invoked_returns_true_when_track_data_invoked_before
+    some_hash = Hash.new
+    tracker_requirements_met = Helpers::DummyTracker.new(requirements_met: true)
+    tracker_requirements_met.track_data(some_hash)
+
+    track_data_invoked = tracker_requirements_met.track_data_invoked?
+
+    assert_equal(true, track_data_invoked)
+  end
 end
