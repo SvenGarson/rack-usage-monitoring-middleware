@@ -39,29 +39,4 @@ class RackUsageTrackingTrackerTest < Minitest::Test
 
     assert_equal(true, hashes_identical)
   end
-
-  def test_that_RackUsageTracking_Tracker_responds_to_track
-    assert_equal(true, RackUsageTracking::Tracker.new.respond_to?(:track))
-  end
-
-  def test_that_RackUsageTracking_Tracker_track_takes_single_hash_argument
-    tracker = RackUsageTracking::Tracker.new
-    hash = Hash.new
-
-    track = tracker.track(hash)
-
-    refute_nil(track)
-  end
-
-  def test_that_RackUsageTracking_Tracker_track_returns_un_mutated_hash_argument
-    tracker = RackUsageTracking::Tracker.new
-    hash = {'foo' => 'bar', 'Ant' => 'Man'}
-    hash_data_points_before_invocation = Helpers::HashDataPoints.new(hash)
-
-    tracked_env = tracker.track(hash)
-    hash_data_points_after_invocation = Helpers::HashDataPoints.new(tracked_env)
-    hashes_identical = (hash_data_points_before_invocation == hash_data_points_after_invocation)
-
-    assert_equal(true, hashes_identical)
-  end
 end

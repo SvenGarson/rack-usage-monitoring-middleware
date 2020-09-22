@@ -18,10 +18,6 @@ module RackUsageTracking
     def requirements_met?(env)
       false
     end
-
-    def track(env)
-      env
-    end
   end
 
   class TrackerRegister
@@ -63,12 +59,26 @@ module RackUsageTracking
   end
 
   class TrackerRequest < Tracker
+    def initialize
+      @counter = RackUsageAttributes::AttributeCounter.new
+      @daily_reset_counter = RackUsageAttributes::AttributeCounterDailyReset.new
+    end
+
     def requirements_met?(env)
       true
     end
 
     def track_data(env)
-      true
+      @counter.update
+      @daily_reset_counter.update
+    end
+
+    def count
+      @counter.count
+    end
+
+    def today
+      @daily_reset_counter.today
     end
   end
   class TrackerHttpMethod; end
