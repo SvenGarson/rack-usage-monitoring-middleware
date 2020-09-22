@@ -60,8 +60,8 @@ module RackUsageTracking
 
   class TrackerRequest < Tracker
     def initialize
-      @counter = RackUsageAttributes::AttributeCounter.new
-      @daily_reset_counter = RackUsageAttributes::AttributeCounterDailyReset.new
+      self.counter = RackUsageAttributes::AttributeCounter.new
+      self.daily_reset_counter = RackUsageAttributes::AttributeCounterDailyReset.new
     end
 
     def requirements_met?(env)
@@ -69,19 +69,54 @@ module RackUsageTracking
     end
 
     def track_data(env)
-      @counter.update
-      @daily_reset_counter.update
+      counter.update
+      daily_reset_counter.update
     end
 
     def count
-      @counter.count
+      counter.count
     end
 
     def today
-      @daily_reset_counter.today
+      daily_reset_counter.today
     end
+
+    private
+
+    attr_accessor(:counter, :daily_reset_counter)
   end
-  class TrackerHttpMethod; end
+
+  class TrackerHttpMethod < Tracker
+    def initialize
+      self.frequency = RackUsageAttributes::AttributeFrequency.new
+    end
+
+    def requirements_met?(env)
+      env.has_key?(Constants::KEY_REQUEST_METHOD)
+    end
+
+    def track_data(env)
+      http_method = env[Constants::KEY_REQUEST_METHOD]
+
+      frequency.update(http_method)
+    end
+
+    def least_frequent
+      frequency.least_frequent
+    end
+
+    def most_frequent
+      frequency.most_frequent
+    end
+
+    def all
+      frequency.all
+    end
+
+    private
+
+    attr_accessor(:frequency)
+  end
   class TrackerAcceptedLanguage; end
   class TrackerAcceptedEncoding; end
   class TrackerPath; end
