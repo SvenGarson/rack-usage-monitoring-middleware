@@ -49,13 +49,13 @@ module RackUsageAttributes
     end
 
     def update_each(object=nil)
-      daily_counter.update
-
       # reset counter if date changes
       if RackUsageUtils::OverrideableDate.today != counter_date
         self.daily_counter = AttributeCounter.new
         self.counter_date = RackUsageUtils::OverrideableDate.today
       end
+      
+      daily_counter.update
 
       daily_counter.count
     end

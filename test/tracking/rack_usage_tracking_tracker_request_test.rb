@@ -119,15 +119,19 @@ class RackUsageTrackingTrackerRequestTest < Minitest::Test
     some_hash = Hash.new
     tracker_request = RackUsageTracking::TrackerRequest.new
 
+    # go through over a year of dates starting at today
     400.times do |day|
-      # go through over a year of dates starting today
+      # set date to use and lock the data for todays requests
       RackUsageUtils::OverrideableDate.set_today_date(base_date + day)
-      # need to force update
-      # maby just set the tracker to soe data to uniformly force update here?
+
+      # force update on tracker request to test whether reset to zero is triggered
+      # but this update counts as request, so the zero is immediately incremented to one
+      tracker_request.track_data(some_hash)
 
       requests_made_today = (rand * 100.0).to_i
 
-      requests_made_today.times do |expected_today|
+      requests_made_today.times do |request_index|
+        expected_today = request_index + 1
         actual_today = tracker_request.today
 
         tracker_request.track_data(some_hash)
@@ -136,12 +140,4 @@ class RackUsageTrackingTrackerRequestTest < Minitest::Test
       end
     end
   end
-
-=begin
-  Tests to write:
-  > #today
-    - when date changed, resets count to zero AFTER update (UTC) as int
-      so USE #track_data to force reset to zero here
-
-=end
 end

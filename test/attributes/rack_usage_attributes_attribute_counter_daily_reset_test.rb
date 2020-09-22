@@ -63,11 +63,12 @@ class RackUsageAttributesAttributeCounterDailyResetTest < Minitest::Test
     reset_counter.update
     assert_equal(1, reset_counter.today)
 
+    # internally resets to zero but the update counts as request, so it must be counted to 'today'
     RackUsageUtils::OverrideableDate.set_today_date(base_date + 1)    
     reset_counter.update
-    assert_equal(0, reset_counter.today)
-    reset_counter.update
     assert_equal(1, reset_counter.today)
+    reset_counter.update
+    assert_equal(2, reset_counter.today)
   end
 
   def test_that_RackUsageAttributes_AttributeCounterDailyReset_today_resets_to_zero_each_day_for_over_a_year
@@ -75,16 +76,23 @@ class RackUsageAttributesAttributeCounterDailyResetTest < Minitest::Test
     RackUsageUtils::OverrideableDate.set_today_date(today_date)
 
     reset_counter = RackUsageAttributes::AttributeCounterDailyReset.new
+    initial_request = true
 
     400.times do |_|
-      assert_equal(0, reset_counter.today)
+      reset_expected_today = (initial_request == true) ? 0 : 1
+      next_expected_today = reset_expected_today + 1
+
+      assert_equal(reset_expected_today, reset_counter.today)
       reset_counter.update
-      assert_equal(1, reset_counter.today)
+      assert_equal(next_expected_today, reset_counter.today)
       
       # go to next day and reset
       today_date += 1
       RackUsageUtils::OverrideableDate.set_today_date(today_date)    
       reset_counter.update
+
+      # next request is not the initial request
+      initial_request = false
     end
   end
 end
