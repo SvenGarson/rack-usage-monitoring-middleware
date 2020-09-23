@@ -167,7 +167,57 @@ module RackUsageTracking
 
     attr_accessor(:frequency)
   end
-  class TrackerAcceptedEncoding; end
+
+  class TrackerAcceptedEncoding < Tracker
+    def initialize
+      @frequency = RackUsageAttributes::AttributeFrequency.new
+    end
+
+    def requirements_met?(env)
+      env.has_key?(Constants::KEY_ACCEPT_ENCODING)
+    end
+
+    def track_data(env)
+      accepted_encodings_header = env[Constants::KEY_ACCEPT_ENCODING]
+
+      encoding_strings = encodings_without_weights_from(accepted_encodings_header)
+
+      # track each language separately
+      frequency.update(encoding_strings)
+    end
+
+    def least_frequent
+      @frequency.least_frequent
+    end
+
+    def most_frequent
+      @frequency.most_frequent
+    end
+
+    def all
+      @frequency.all
+    end
+
+    private
+
+    def encodings_without_weights_from(accepted_encodings_header)
+      return '' if accepted_encodings_header.empty?
+
+      encoding_weight_strings = accepted_encodings_header.split(/,|, /)
+
+      encoding_strings = encoding_weight_strings.map do |encoding_weight_string|
+        encoding_weight_string.split(';').first
+      end
+
+      # remove optional leading and trailing whitespace for each accepted encoding
+      encoding_strings.map!(&:strip)
+
+      encoding_strings
+    end
+
+    attr_accessor(:frequency)
+  end
+  
   class TrackerPath; end
   class TrackerQueryString; end
   class TrackerRoute; end

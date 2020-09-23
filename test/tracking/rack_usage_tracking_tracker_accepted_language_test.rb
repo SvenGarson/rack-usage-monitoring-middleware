@@ -315,7 +315,7 @@ class RackUsageTrackingTrackerAcceptedLanguageTest < Minitest::Test
     tracker_accepted_language.track_data(accepted_languages_request_hash)
     all = tracker_accepted_language.all
 
-    assert_same(1, all.size)
+    assert_equal(1, all.size)
     assert_includes(all, 'en')
   end
 
@@ -326,7 +326,7 @@ class RackUsageTrackingTrackerAcceptedLanguageTest < Minitest::Test
     tracker_accepted_language.track_data(accepted_languages_request_hash)
     all = tracker_accepted_language.all
 
-    assert_same(1, all.size)
+    assert_equal(1, all.size)
     assert_includes(all, 'en')
   end
 
@@ -337,7 +337,7 @@ class RackUsageTrackingTrackerAcceptedLanguageTest < Minitest::Test
     tracker_accepted_language.track_data(accepted_languages_request_hash)
     all = tracker_accepted_language.all
 
-    assert_same(1, all.size)
+    assert_equal(1, all.size)
     assert_includes(all, '*')
   end
 
@@ -348,7 +348,7 @@ class RackUsageTrackingTrackerAcceptedLanguageTest < Minitest::Test
     tracker_accepted_language.track_data(accepted_languages_request_hash)
     all = tracker_accepted_language.all
 
-    assert_same(1, all.size)
+    assert_equal(1, all.size)
     assert_includes(all, '*')
   end
 
@@ -359,7 +359,7 @@ class RackUsageTrackingTrackerAcceptedLanguageTest < Minitest::Test
     tracker_accepted_language.track_data(accepted_languages_request_hash)
     all = tracker_accepted_language.all
 
-    assert_same(1, all.size)
+    assert_equal(1, all.size)
     assert_includes(all, '')
   end
 
@@ -370,7 +370,7 @@ class RackUsageTrackingTrackerAcceptedLanguageTest < Minitest::Test
     tracker_accepted_language.track_data(accepted_languages_request_hash)
     all = tracker_accepted_language.all
 
-    assert_same(1, all.size)
+    assert_equal(1, all.size)
     assert_includes(all, '')
   end
 
@@ -390,7 +390,6 @@ class RackUsageTrackingTrackerAcceptedLanguageTest < Minitest::Test
     assert_includes(all, '')
   end
 
-  # ------------------ DONE TILL HERE | I.E CONTINUE UNDER THIS LINE ---------------------
   def test_that_RackUsageTracking_TrackerAcceptedLanguage_parses_multi_language_header_with_leading_and_trailing_whitespace_around_language_correctly
     accepted_languages = [
       '    en',
@@ -413,12 +412,49 @@ class RackUsageTrackingTrackerAcceptedLanguageTest < Minitest::Test
     assert_includes(all, 'fr')
     assert_includes(all, '')
   end
-end
-=begin
 
-  More tests:
-    (> multi language header separated with comma consistently parsed correctly)
-    (> multi language header separated with comma-space consistently parsed correctly)
-    > separated with comma but ranodm leading and trailing whitespace
-    > multi language header separated with random comma and comma-space consistently parsed correctly
-=end 
+  def test_that_RackUsageTracking_TrackerAcceptedLanguage_parses_multi_language_header_with_languages_separated_by_comma_correctly
+    accepted_languages = ['en;q=0.5', 'de;q=0.6', 'fr;q=0.7'].join(',')
+    accepted_languages_request_hash = { 'HTTP_ACCEPT_LANGUAGE' => accepted_languages }
+    tracker_accepted_language = RackUsageTracking::TrackerAcceptedLanguage.new
+
+    tracker_accepted_language.track_data(accepted_languages_request_hash)
+    all = tracker_accepted_language.all
+
+    assert_equal(3, all.size)
+    assert_includes(all, 'en')
+    assert_includes(all, 'de')
+    assert_includes(all, 'fr')
+  end
+
+  def test_that_RackUsageTracking_TrackerAcceptedLanguage_parses_multi_language_header_with_languages_separated_by_comma_space_correctly
+    accepted_languages = ['en;q=0.5', 'de;q=0.6', 'fr;q=0.7'].join(', ')
+    accepted_languages_request_hash = { 'HTTP_ACCEPT_LANGUAGE' => accepted_languages }
+    tracker_accepted_language = RackUsageTracking::TrackerAcceptedLanguage.new
+
+    tracker_accepted_language.track_data(accepted_languages_request_hash)
+    all = tracker_accepted_language.all
+
+    assert_equal(3, all.size)
+    assert_includes(all, 'en')
+    assert_includes(all, 'de')
+    assert_includes(all, 'fr')
+  end
+
+  def test_that_RackUsageTracking_TrackerAcceptedLanguage_parses_multi_language_header_with_languages_separated_by_comma_or_comma_space_correctly
+    comma = ','
+    comma_space = ', '
+    accepted_languages = 'en;q=0.5' + comma_space + 'de;q=0.6' + comma + 'fr;q=0.7' + comma_space + 'nl;q=0.9'
+    accepted_languages_request_hash = { 'HTTP_ACCEPT_LANGUAGE' => accepted_languages }
+    tracker_accepted_language = RackUsageTracking::TrackerAcceptedLanguage.new
+
+    tracker_accepted_language.track_data(accepted_languages_request_hash)
+    all = tracker_accepted_language.all
+
+    assert_equal(4, all.size)
+    assert_includes(all, 'en')
+    assert_includes(all, 'de')
+    assert_includes(all, 'fr')
+    assert_includes(all, 'nl')
+  end
+end
