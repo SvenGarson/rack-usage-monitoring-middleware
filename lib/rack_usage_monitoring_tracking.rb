@@ -144,17 +144,23 @@ module RackUsageTracking
       frequency.most_frequent
     end
 
+    def all
+      frequency.all
+    end
+
     private
 
     def languages_without_weights_from(accepted_languages_header)
-      language_weight_strings = accepted_languages_header.split(/,|, /)
+      return '' if accepted_languages_header.empty?
 
-      # remove optional leading and trailing whitespace for each accepted language
-      language_weight_strings.map!(&:strip)
+      language_weight_strings = accepted_languages_header.split(/,|, /)
 
       language_strings = language_weight_strings.map do |language_weight_string|
         language_weight_string.split(';').first
       end
+
+      # remove optional leading and trailing whitespace for each accepted language
+      language_strings.map!(&:strip)
 
       language_strings
     end
