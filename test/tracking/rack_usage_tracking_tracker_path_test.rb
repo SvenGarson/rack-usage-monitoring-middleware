@@ -72,6 +72,7 @@ class RackUsageTrackingTrackerPathTest < Minitest::Test
 
     assert_equal(true, hashes_identical)
   end
+  
   def test_that_RackUsageTracking_TrackerPath_responds_to_least_frequent
     tracker_path = RackUsageTracking::TrackerPath.new
 

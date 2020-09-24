@@ -256,7 +256,43 @@ module RackUsageTracking
     attr_accessor(:frequency, :string_length)
   end
 
-  class TrackerQueryString; end
+  class TrackerQueryString < Tracker
+    def initialize
+      self.frequency = RackUsageAttributes::AttributeFrequency.new
+      self.string_length = RackUsageAttributes::AttributeStringLength.new
+    end
+
+    def requirements_met?(env)
+      env.has_key?(Constants::KEY_QUERY_STRING)
+    end
+
+    def track_data(env)
+      query_string = env[Constants::KEY_QUERY_STRING]
+    
+      frequency.update(query_string)
+      string_length.update(query_string)
+    end
+
+    def least_frequent
+      frequency.least_frequent
+    end
+
+    def most_frequent
+      frequency.most_frequent
+    end
+
+    def has_longest?
+      string_length.has_longest?
+    end
+
+    def longest
+      string_length.longest
+    end
+
+    private
+
+    attr_accessor(:frequency, :string_length)
+  end
   class TrackerRoute; end
   class TrackerHttpVersion; end
   class TrackerQueryParameter; end
