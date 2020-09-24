@@ -349,8 +349,3 @@ class RackUsageTrackingTrackerRouteTest < Minitest::Test
     assert_equal(%w(/books?name=MobyDick), least_frequent)
   end
 end
-
-=begin
-  - route has single '?' if query string is NOT led by '?' ==> NONE ADDED
-  - route has single '?' if query string is led by '?'     ==>  YES ADDED
-=end
