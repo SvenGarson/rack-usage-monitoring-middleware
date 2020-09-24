@@ -170,7 +170,7 @@ module RackUsageTracking
 
   class TrackerAcceptedEncoding < Tracker
     def initialize
-      @frequency = RackUsageAttributes::AttributeFrequency.new
+      self.frequency = RackUsageAttributes::AttributeFrequency.new
     end
 
     def requirements_met?(env)
@@ -187,15 +187,15 @@ module RackUsageTracking
     end
 
     def least_frequent
-      @frequency.least_frequent
+      frequency.least_frequent
     end
 
     def most_frequent
-      @frequency.most_frequent
+      frequency.most_frequent
     end
 
     def all
-      @frequency.all
+      frequency.all
     end
 
     private
@@ -218,7 +218,44 @@ module RackUsageTracking
     attr_accessor(:frequency)
   end
   
-  class TrackerPath; end
+  class TrackerPath < Tracker
+    def initialize
+      self.frequency = RackUsageAttributes::AttributeFrequency.new
+      self.string_length = RackUsageAttributes::AttributeStringLength.new
+    end
+
+    def requirements_met?(env)
+      env.has_key?(Constants::KEY_PATH_INFO)
+    end
+
+    def track_data(env)
+      path_info = env[Constants::KEY_PATH_INFO]
+
+      frequency.update(path_info)
+      string_length.update(path_info)
+    end
+
+    def least_frequent
+      frequency.least_frequent
+    end
+
+    def most_frequent
+      frequency.most_frequent
+    end
+
+    def has_longest?
+      string_length.has_longest?
+    end
+
+    def longest
+      string_length.longest
+    end
+
+    private
+
+    attr_accessor(:frequency, :string_length)
+  end
+
   class TrackerQueryString; end
   class TrackerRoute; end
   class TrackerHttpVersion; end

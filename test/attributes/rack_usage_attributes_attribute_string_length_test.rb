@@ -134,6 +134,16 @@ class RackUsageAttributesAttributeStringLengthTest < Minitest::Test
     assert_equal(one_character_string, shortest)
   end
 
+  def test_that_RackUsageAttributes_AttributeStringLength_ignores_empty_strings_as_shortest_string
+    string_length = RackUsageAttributes::AttributeStringLength.new
+    empty_string = String.new
+    string_length.update(empty_string)
+
+    has_shortest = string_length.has_shortest?
+
+    assert_equal(false, has_shortest)
+  end
+
   def test_that_RackUsageAttributes_AttributeStringLength_does_update_shortest_string_when_update_string_has_same_length
     string_length = RackUsageAttributes::AttributeStringLength.new
 
@@ -267,6 +277,16 @@ class RackUsageAttributesAttributeStringLengthTest < Minitest::Test
     longest = string_length.longest
 
     assert_equal(one_character_string, longest)
+  end
+
+  def test_that_RackUsageAttributes_AttributeStringLength_ignores_empty_strings_as_longest_string
+    string_length = RackUsageAttributes::AttributeStringLength.new
+    empty_string = String.new
+    string_length.update(empty_string)
+
+    has_longest = string_length.has_longest?
+
+    assert_equal(false, has_longest)
   end
 
   def test_that_RackUsageAttributes_AttributeStringLength_does_update_longest_string_when_update_string_has_same_length

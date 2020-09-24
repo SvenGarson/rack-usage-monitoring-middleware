@@ -458,13 +458,4 @@ class RackUsageTrackingTrackerAcceptedEncodingTest < Minitest::Test
     assert_includes(all, '*')
     assert_includes(all, '')
   end
-
-  def test_meep
-    accepted_encodings_request_hash = { 'HTTP_ACCEPT_ENCODING' => '' }
-    tracker_accepted_encoding = RackUsageTracking::TrackerAcceptedEncoding.new
-
-    tracker_accepted_encoding.track_data(accepted_encodings_request_hash)
-    # CHECK WHAT TRIGGERS THE ERROR for split on nil
-    #all = tracker_accepted_encoding.all
-  end
 end

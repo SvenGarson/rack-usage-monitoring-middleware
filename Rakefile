@@ -50,7 +50,7 @@ end
 
 desc('Run current test suite')
 task(:test_current) do
-  system("RACK_ENV=#{RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT} bundle exec ruby test/tracking/rack_usage_tracking_tracker_accepted_encoding_test.rb")
+  system("RACK_ENV=#{RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT} bundle exec ruby test/tracking/rack_usage_tracking_tracker_path_test.rb")
 end
 
 desc('Run all tests')
