@@ -341,6 +341,52 @@ module RackUsageTracking
     attr_accessor(:frequency, :string_length)
   end
 
-  class TrackerHttpVersion; end
+  class TrackerHttpVersion < Tracker
+    def initialize
+      self.frequency = RackUsageAttributes::AttributeFrequency.new
+      self.ranking = RackUsageAttributes::AttributeRanking.new
+    end
+
+    def requirements_met?(env)
+      env.has_key?(Constants::KEY_HTTP_VERSION)
+    end
+
+    def track_data(env)
+      http_version_string = env[Constants::KEY_HTTP_VERSION]
+      http_version = RackUsageTrackingHelpers::HttpVersion.new(http_version_string)
+
+      frequency.update(http_version)
+      ranking.update(http_version)
+    end
+
+    def least_frequent
+      frequency.least_frequent
+    end
+
+    def most_frequent
+      frequency.most_frequent
+    end
+
+    def all
+      frequency.all
+    end
+
+    def has_ranking?
+      ranking.has_ranking?
+    end
+
+    def lowest
+      ranking.lowest
+    end
+
+    def highest
+      ranking.highest
+    end
+
+    private
+
+    attr_accessor(:frequency, :ranking)
+  end
+
   class TrackerQueryParameter; end
 end
