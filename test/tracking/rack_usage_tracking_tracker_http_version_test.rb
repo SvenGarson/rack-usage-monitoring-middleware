@@ -7,6 +7,7 @@ class RackUsageTrackingTrackerHttpVersionTest < Minitest::Test
 
     assert(tracker_http_version_accessible)
   end
+  
   def test_that_RackUsageTracking_TrackerHttpVersion_is_subclass_of_Tracker
     is_subclass_of_tracker = (RackUsageTracking::TrackerHttpVersion < RackUsageTracking::Tracker)
 

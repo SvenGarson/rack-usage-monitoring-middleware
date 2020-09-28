@@ -388,5 +388,32 @@ module RackUsageTracking
     attr_accessor(:frequency, :ranking)
   end
 
-  class TrackerQueryParameter; end
+  class TrackerQueryParameter < Tracker
+    def initialize
+      self.frequency = RackUsageAttributes::AttributeFrequency.new
+    end
+
+    def requirements_met?(env)
+      env.has_key?(Constants::KEY_QUERY_STRING)
+    end
+
+    def track_data(env)
+      query_string = env[Constants::KEY_QUERY_STRING]
+      query_parameters = RackUsageTrackingHelpers::QueryParameter.parse_query_string(query_string)
+
+      frequency.update(query_parameters)
+    end
+
+    def least_frequent
+      frequency.least_frequent
+    end
+
+    def most_frequent
+      Array.new
+    end
+
+    private
+
+    attr_accessor(:frequency)
+  end
 end

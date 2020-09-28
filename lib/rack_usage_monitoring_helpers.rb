@@ -65,7 +65,7 @@
     def self.parse_query_string(query_string)
       query_string = strip_leading_question_mark(query_string)
       query_string.split('&', -1).map do |key_value_string|
-        QueryParameter.new(key_value_string)
+        self.new(key_value_string)
       end
     end
 
@@ -75,6 +75,22 @@
 
     def value
       @value.dup
+    end
+
+    def hash
+      to_s.hash
+    end
+
+    def eql?(other)
+      to_s == other.to_s
+    end
+
+    def ==(other)
+      eql?(other)
+    end
+
+    def to_s
+      key + value
     end
 
     private
