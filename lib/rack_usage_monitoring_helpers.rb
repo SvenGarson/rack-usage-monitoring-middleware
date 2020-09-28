@@ -90,7 +90,7 @@
     end
 
     def to_s
-      key + value
+      key + '=' + value
     end
 
     private

@@ -391,6 +391,8 @@ module RackUsageTracking
   class TrackerQueryParameter < Tracker
     def initialize
       self.frequency = RackUsageAttributes::AttributeFrequency.new
+      self.string_length = RackUsageAttributes::AttributeStringLength.new
+      self.average = RackUsageAttributes::AttributeNumberAverage.new
     end
 
     def requirements_met?(env)
@@ -400,8 +402,12 @@ module RackUsageTracking
     def track_data(env)
       query_string = env[Constants::KEY_QUERY_STRING]
       query_parameters = RackUsageTrackingHelpers::QueryParameter.parse_query_string(query_string)
+      query_parameter_count = query_parameters.size
+      query_parameters_as_strings = query_parameters.map(&:to_s)
 
       frequency.update(query_parameters)
+      string_length.update(query_parameters_as_strings)
+      average.update(query_parameter_count)
     end
 
     def least_frequent
@@ -409,11 +415,32 @@ module RackUsageTracking
     end
 
     def most_frequent
-      Array.new
+      frequency.most_frequent
+    end
+
+    def all
+      frequency.all
+    end
+
+    def has_longest?
+      string_length.has_longest?
+    end
+
+    def longest
+      if has_longest?
+        longest_query_parameter = string_length.longest
+        RackUsageTrackingHelpers::QueryParameter.new(longest_query_parameter)
+      else
+        nil
+      end
+    end
+
+    def average_per_request
+      average.average
     end
 
     private
 
-    attr_accessor(:frequency)
+    attr_accessor(:frequency, :string_length, :average)
   end
 end
