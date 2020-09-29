@@ -2,25 +2,26 @@ require_relative '../test_prerequisites'
 require_relative '../test_helpers'
 
 class RackUsageMonitoringHttpMethodsTest < Minitest::Test
-  def test_that_RackUsageMonitoring_UsageDataProtected_http_methods_returns_instance_of_TrackerHttpMethod
+  def test_that_RackUsageMonitoring_UsageDataProtected_accepted_languages_returns_instance_of_TrackerAcceptedLanguage
     middleware_wrapper = Helpers.middleware_usage_data_protected_access_wrapper
 
-    tracker_http_method = middleware_wrapper.usage_data_protected.http_methods
+    tracker_accepted_language = middleware_wrapper.usage_data_protected.accepted_languages
 
-    assert_instance_of(RackUsageTracking::TrackerHttpMethod, tracker_http_method)
+    assert_instance_of(RackUsageTracking::TrackerAcceptedLanguage, tracker_accepted_language)
   end
 
-  def test_that_RackUsageMonitoring_UsageDataProtected_http_methods_least_frequent_returns_expected_http_method_strings
+  def test_that_RackUsageMonitoring_UsageDataProtected_accepted_languages_least_frequent_returns_expected_accepted_language_strings
     middleware_wrapper = Helpers.middleware_usage_data_protected_access_wrapper
+    skip
     mock_request = Rack::MockRequest.new(middleware_wrapper)
 
-    3.times { |_| mock_request.get('/') }
-    7.times { |_| mock_request.put('/') }
-    11.times { |_| mock_request.post('/') }
-    3.times { |_| mock_request.options('/') }
+    3.times { |_| mock_request.get('/', 'HTTP_ACCEPT' => 'fr-CH') }
+    3.times { |_| mock_request.get('/', 'HTTP_ACCEPT' => 'fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5') }
+    3.times { |_| mock_request.get('/', 'HTTP_ACCEPT' => 'fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5') }
+    3.times { |_| mock_request.get('/', 'HTTP_ACCEPT' => 'fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5') }
 
-    tracker_http_method = middleware_wrapper.usage_data_protected.http_methods
-    least_frequent_methods = tracker_http_method.least_frequent
+    tracker_accepted_language = middleware_wrapper.usage_data_protected.accepted_languages
+    least_frequent_methods = tracker_accepted_language.least_frequent
     least_frequent_methods_count = least_frequent_methods.size
 
     assert_equal(2, least_frequent_methods_count)
@@ -30,7 +31,8 @@ class RackUsageMonitoringHttpMethodsTest < Minitest::Test
     refute_includes(least_frequent_methods, 'POST')
   end
 
-  def test_that_RackUsageMonitoring_UsageDataProtected_http_methods_most_frequent_returns_expected_http_method_strings
+  def test_that_RackUsageMonitoring_UsageDataProtected_accepted_languages_most_frequent_returns_expected_accepted_language_strings
+skip
     middleware_wrapper = Helpers.middleware_usage_data_protected_access_wrapper
     mock_request = Rack::MockRequest.new(middleware_wrapper)
 
@@ -39,8 +41,8 @@ class RackUsageMonitoringHttpMethodsTest < Minitest::Test
     11.times { |_| mock_request.post('/') }
     9.times { |_| mock_request.options('/') }
 
-    tracker_http_method = middleware_wrapper.usage_data_protected.http_methods
-    most_frequent_methods = tracker_http_method.most_frequent
+    tracker_accepted_language = middleware_wrapper.usage_data_protected.accepted_languages
+    most_frequent_methods = tracker_accepted_language.most_frequent
     most_frequent_methods_count = most_frequent_methods.size
 
     assert_equal(2, most_frequent_methods_count)
@@ -50,7 +52,8 @@ class RackUsageMonitoringHttpMethodsTest < Minitest::Test
     refute_includes(most_frequent_methods, 'OPTIONS')
   end
 
-  def test_that_RackUsageMonitoring_UsageDataProtected_http_methods_all_returns_expected_http_method_strings
+  def test_that_RackUsageMonitoring_UsageDataProtected_accepted_languages_all_returns_expected_accepted_language_strings
+skip
     middleware_wrapper = Helpers.middleware_usage_data_protected_access_wrapper
     mock_request = Rack::MockRequest.new(middleware_wrapper)
 
@@ -59,8 +62,8 @@ class RackUsageMonitoringHttpMethodsTest < Minitest::Test
     17.times { |_| mock_request.post('/') }
     9.times { |_| mock_request.options('/') }
 
-    tracker_http_method = middleware_wrapper.usage_data_protected.http_methods
-    all_methods = tracker_http_method.all
+    tracker_accepted_language = middleware_wrapper.usage_data_protected.accepted_languages
+    all_methods = tracker_accepted_language.all
     all_methods_count = all_methods.size
 
     assert_equal(4, all_methods_count)

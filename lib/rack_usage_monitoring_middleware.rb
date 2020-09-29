@@ -34,6 +34,7 @@ module RackUsageMonitoring
     def add_trackers
       tracker_register.register(:requests, RackUsageTracking::TrackerRequest.new)
       tracker_register.register(:http_methods, RackUsageTracking::TrackerHttpMethod.new)
+      tracker_register.register(:accepted_languages, RackUsageTracking::TrackerAcceptedLanguage.new)
     end
   end
 

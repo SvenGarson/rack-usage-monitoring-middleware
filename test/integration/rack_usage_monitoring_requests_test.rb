@@ -4,7 +4,6 @@ require_relative '../test_helpers'
 class RackUsageMonitoringRequestsTest < Minitest::Test
   def test_that_RackUsageMonitoring_UsageDataProtected_requests_returns_instance_of_TrackerRequest
     middleware_wrapper = Helpers.middleware_usage_data_protected_access_wrapper
-    mock_request = Rack::MockRequest.new(middleware_wrapper)
     usage_data_protected = middleware_wrapper.usage_data_protected
 
     tracker_request = usage_data_protected.requests
