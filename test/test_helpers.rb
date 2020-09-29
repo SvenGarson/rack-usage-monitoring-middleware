@@ -1,6 +1,45 @@
 require 'securerandom'
 
 module Helpers
+  class DummyEndware
+    def call(env)
+      Rack::Response.new.finish
+    end
+  end
+
+  class RackUsageMonitoringWrapper
+    attr_reader(:usage_data_protected)
+
+    def initialize(endware)
+      self.usage_monitoring_middleware = RackUsageMonitoring::Middleware.new(endware)
+      self.usage_data_protected = usage_monitoring_middleware.usage_data_protected
+    end
+
+    def call(env)
+      # #call(env) rack usage middleware which has the following effects:
+      # 1. rack usage middleware tracks data and adds ProtectedUsageData object to env hash
+      # 2. rack usage middleware propagates #call(env) to endware
+      # 3. rack usage middleware returns the response returned from endware#call
+      endware_response = usage_monitoring_middleware.call(env)
+
+      # keep a reference of the UsageDataProtected the middleware just generated
+      self.usage_data_protected = RackUsageMonitoring::usage_data(env)
+
+      # return the endware response
+      endware_response
+    end
+
+    private
+
+    attr_writer(:usage_data_protected)
+    attr_accessor(:usage_monitoring_middleware)
+  end
+
+  def self.middleware_usage_data_protected_access_wrapper
+    endware = DummyEndware.new
+    RackUsageMonitoringWrapper.new(endware)
+  end
+
   class DummyTracker
     def initialize(requirements_met:)
       @requirements_met = requirements_met

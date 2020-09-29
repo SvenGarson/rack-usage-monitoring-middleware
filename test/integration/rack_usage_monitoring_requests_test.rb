@@ -1,86 +1,62 @@
 require_relative '../test_prerequisites'
-
+require_relative '../test_helpers'
 
 class RackUsageMonitoringRequestsTest < Minitest::Test
-  def test_that_something_when_something
-    # middleware wrapper in order to acceess usage data protected
-    middleware_wrapper = middleware_usage_data_protected_access_wrapper
-
-    # mock request to the middleware where the responds is the one from DummyEndware
+  def test_that_RackUsageMonitoring_UsageDataProtected_requests_returns_instance_of_TrackerRequest
+    middleware_wrapper = Helpers.middleware_usage_data_protected_access_wrapper
     mock_request = Rack::MockRequest.new(middleware_wrapper)
+    usage_data_protected = middleware_wrapper.usage_data_protected
 
-    # make all requests to mock_request - disregard the endware response
-    mock_request.get('http://www.meep.com/books?name=MobyDick')
+    tracker_request = usage_data_protected.requests
 
-    # get a hold of the usage data protected from the middleware env hash
+    assert_instance_of(RackUsageTracking::TrackerRequest, tracker_request)
+  end
+
+  def test_that_RackUsageMonitoring_UsageDataProtected_requests_total_returns_expected_integer
+    middleware_wrapper = Helpers.middleware_usage_data_protected_access_wrapper
+    mock_request = Rack::MockRequest.new(middleware_wrapper)
     
-
-    # get a hold of the tracker to test
-
-    # assert tracker data
-  end
-
-  private
-
-  class DummyEndware
-    def call(env)
-      Rack::Response.new.finish
-    end
-  end
-
-  class RackUsageMonitoringWrapper
-    attr_reader(:usage_data_protected)
-
-    def initialize(endware)
-      self.usage_monitoring_middleware = RackUsageMonitoring::Middleware.new(endware)
+    37.times do |_|
+      mock_request.get('')
     end
 
-    def call(env)
-      # #call(env) rack usage middleware which has the following effects:
-      # 1. rack usage middleware tracks data and adds usage data objects to env hash
-      # 2. rack usage middleware propagates #call(env) to endware
-      # 3. rack usage middleware returns the response returned from endware#call
-      endware_response = usage_monitoring_middleware.call(env)
+    usage_data_protected = middleware_wrapper.usage_data_protected
+    tracker_request = usage_data_protected.requests
+    total_requests = tracker_request.total
 
-      # get a hold of the usage data through the wrapper
-      self.usage_data_protected = RackUsageMonitoring::usage_data(env)
-
-      # return the endware response
-      endware_response
-    end
-
-    private
-
-    attr_writer(:usage_data_protected)
-    attr_accessor(:usage_monitoring_middleware)
+    assert_instance_of(Integer, total_requests)
+    assert_equal(37, total_requests)
   end
 
-  def middleware_usage_data_protected_access_wrapper
-    endware = DummyEndware.new
-    RackUsageMonitoringWrapper.new(endware)
+  def test_that_RackUsageMonitoring_UsageDataProtected_requests_today_returns_expected_integer
+    middleware_wrapper = Helpers.middleware_usage_data_protected_access_wrapper
+    mock_request = Rack::MockRequest.new(middleware_wrapper)
+    
+    # before any request received
+    tracker_request = middleware_wrapper.usage_data_protected.requests
+    requests_before_any_requests = tracker_request.today
+
+    # requests first day
+    base_date = Date.today
+    RackUsageUtils::OverrideableDate.set_today_date(base_date)
+    100.times do |_|
+      mock_request.get('')
+    end
+
+    tracker_request = middleware_wrapper.usage_data_protected.requests
+    requests_first_day = tracker_request.today
+
+    # requests second day
+    RackUsageUtils::OverrideableDate.set_today_date(base_date + 1)
+    255.times do |_|
+      mock_request.get('')
+    end
+
+    tracker_request = middleware_wrapper.usage_data_protected.requests
+    requests_second_day = tracker_request.today
+    
+    assert_equal(0, requests_before_any_requests)
+    assert_equal(100, requests_first_day)
+    assert_equal(255, requests_second_day)
   end
 end
-
-=begin
-
-  How to begin the testing for the middleware integration:
-  - setup stack
-  - make requests with needed data points
-  - get a hold of the UsageDataProtected
-  - get the tracker to be tested
-  > assert against tracker instance
-    - correct object (instance of) # also makes sure the tracker specific tests are in place
-    - correct returns data for each tracker attribute
-
-
-  # 1. middleware: update trackers and generate UsageDataProtected + add into env hash
-  # 2. wrapper   : get a hold of UsageDataProtected through env hash and make available through method
-  # 3. endware   : generate base response so Rack runs properly
-  # 4. get UageDataProtected and assert against it
-
-
-  Requests tests to run
-    - correct tracker instance
-    - #count as expected / starts at zero
-    - #today as expected / starts at zero
-=end

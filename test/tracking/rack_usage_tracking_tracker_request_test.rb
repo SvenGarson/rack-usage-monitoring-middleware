@@ -55,31 +55,31 @@ class RackUsageTrackingTrackerRequestTest < Minitest::Test
     assert_equal(true, hashes_identical)
   end
 
-  def test_that_RackUsageTracking_TrackerRequest_responds_to_count
+  def test_that_RackUsageTracking_TrackerRequest_responds_to_total
     tracker_request = RackUsageTracking::TrackerRequest.new
 
-    responds_to_count = tracker_request.respond_to?(:count)
+    responds_to_total = tracker_request.respond_to?(:total)
 
-    assert_equal(true, responds_to_count)
+    assert_equal(true, responds_to_total)
   end
 
-  def test_that_RackUsageTracking_TrackerRequest_count_initialized_to_zero
+  def test_that_RackUsageTracking_TrackerRequest_total_initialized_to_zero
     tracker_request = RackUsageTracking::TrackerRequest.new
 
-    count = tracker_request.count
+    total = tracker_request.total
 
-    assert_equal(0, count)
+    assert_equal(0, total)
   end
 
-  def test_that_RackUsageTracking_TrackerRequest_count_incremented_by_one_for_each_track_data_update
+  def test_that_RackUsageTracking_TrackerRequest_total_incremented_by_one_for_each_track_data_update
     some_hash = Hash.new
     tracker_request = RackUsageTracking::TrackerRequest.new
 
-    0.upto(400) do |expected_count|
-      actual_count = tracker_request.count
+    0.upto(400) do |expected_total|
+      actual_total = tracker_request.total
       tracker_request.track_data(some_hash)
 
-      assert_equal(expected_count, actual_count)
+      assert_equal(expected_total, actual_total)
     end
   end
 

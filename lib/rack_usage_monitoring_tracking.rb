@@ -73,7 +73,7 @@ module RackUsageTracking
       daily_reset_counter.update
     end
 
-    def count
+    def total
       counter.count
     end
 
