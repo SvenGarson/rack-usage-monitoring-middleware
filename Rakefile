@@ -48,10 +48,18 @@ task(:test_test_helpers) do
   end
 end
 
+desc('Run integration tests')
+task(:test_integration) do
+  Dir.glob('test/integration/*_test.rb').each do |file_name|
+    # make this absolute and DRY
+    system("RACK_ENV=#{RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT} bundle exec ruby #{file_name}")
+  end
+end
+
 desc('Run current test suite')
 task(:test_current) do
-  system("RACK_ENV=#{RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT} bundle exec ruby test/tracking/rack_usage_tracking_tracker_query_parameter_test.rb")
+  system("RACK_ENV=#{RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT} bundle exec ruby test/integration/rack_usage_monitoring_requests_test.rb")
 end
 
 desc('Run all tests')
-task :test_all => [:test_middle, :test_helper, :test_attribs, :test_utils, :test_tracking, :test_test_helpers] do; end
+task :test_all => [:test_middle, :test_helper, :test_attribs, :test_utils, :test_tracking, :test_test_helpers, :test_integration] do; end

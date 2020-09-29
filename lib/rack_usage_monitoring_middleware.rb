@@ -1,6 +1,6 @@
-# bundler setup goes into
 require 'bundler/setup'
 require_relative 'rack_usage_monitoring_tracking'
+require 'rack'
 
 module RackUsageMonitoring
 
