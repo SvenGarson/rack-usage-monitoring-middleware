@@ -1,7 +1,7 @@
 require_relative '../test_prerequisites'
 require_relative '../test_helpers'
 
-class RackUsageMonitoringHttpMethodsTest < Minitest::Test
+class RackUsageMonitoringAcceptedLanguagesTest < Minitest::Test
   def test_that_RackUsageMonitoring_UsageDataProtected_accepted_languages_returns_instance_of_TrackerAcceptedLanguage
     middleware_wrapper = Helpers.middleware_usage_data_protected_access_wrapper
 
