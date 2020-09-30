@@ -35,6 +35,14 @@ module RackUsageMonitoring
       tracker_register.register(:requests, RackUsageTracking::TrackerRequest.new)
       tracker_register.register(:http_methods, RackUsageTracking::TrackerHttpMethod.new)
       tracker_register.register(:accepted_languages, RackUsageTracking::TrackerAcceptedLanguage.new)
+
+      tracker_register.register(:accepted_encodings, RackUsageTracking::TrackerAcceptedEncoding.new)
+      tracker_register.register(:paths, RackUsageTracking::TrackerPath.new)
+      tracker_register.register(:query_strings, RackUsageTracking::TrackerQueryString.new)
+
+      tracker_register.register(:routes, RackUsageTracking::TrackerRoute.new)
+      tracker_register.register(:http_versions, RackUsageTracking::TrackerHttpVersion.new)
+      tracker_register.register(:parameters, RackUsageTracking::TrackerQueryParameter.new)
     end
   end
 
