@@ -1,7 +1,7 @@
 require_relative '../test_prerequisites'
 require_relative '../test_helpers'
 
-class RackUsageMonitoringPathsTest < Minitest::Test
+class RackUsageMonitoringQueryStringsTest < Minitest::Test
   def test_that_RackUsageMonitoring_UsageDataProtected_query_strings_returns_instance_of_TrackerQueryString
     middleware_wrapper = Helpers.middleware_usage_data_protected_access_wrapper
 
