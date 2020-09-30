@@ -1,5 +1,23 @@
 require_relative 'lib/rack_usage_monitoring_middleware'
 
+# set RACK_ENV to development when running tests
+# DRY running tests in folder
+# how will this middleware be used?
+#
+# do not touch the RACK_ENV apart from running tests in order to have the Host
+# be able to set the mode to production and the programmer to set his own flags.
+# That correct?
+#
+# Use platform independent way of building directories
+# Use absolute directories where necessary
+
+def run_tests_in_test_sub_directory_in_development_mode(sub_folder_name)
+  Dir.glob('test/middleware/*_test.rb').each do |file_name|
+    # make this absolute and DRY
+    system("RACK_ENV=#{RackUsageMonitoring::Constants::RACK_ENV_DEVELOPMENT} bundle exec ruby #{file_name}")
+  end
+end
+
 desc('Run middleware tests')
 task(:test_middle) do
   Dir.glob('test/middleware/*_test.rb').each do |file_name|
@@ -40,7 +58,7 @@ task(:test_tracking) do
   end
 end
 
-desc('Run test_helpers tests')
+desc('Run test helpers tests')
 task(:test_test_helpers) do
   Dir.glob('test/test_helpers/*_test.rb').each do |file_name|
     # make this absolute and DRY
