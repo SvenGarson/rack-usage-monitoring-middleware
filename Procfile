@@ -1,0 +1,1 @@
+web: bundler exec puma -e ${RACK_ENV:-deployment}

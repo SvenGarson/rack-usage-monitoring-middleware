@@ -1,6 +1,5 @@
 require 'bundler/setup'
 require_relative 'rack_usage_monitoring_tracking'
-require 'rack'
 
 module RackUsageMonitoring
 
@@ -76,7 +75,7 @@ module RackUsageMonitoring
   class Middleware
     def initialize(superseeding_rack_application)
       self.usage_data = UsageData.new
-      self.superseeding_rack_application = superseeding_rack_application
+      self.app = superseeding_rack_application
     end
 
     def call(env)
@@ -87,7 +86,7 @@ module RackUsageMonitoring
       # next rack application in the stack can access that data
       env[Constants::KEY_USAGE_DATA_PROTECTED] = usage_data_protected
 
-      superseeding_rack_application.call(env)
+      app.call(env)
     end
 
     def usage_data_protected
@@ -100,6 +99,6 @@ module RackUsageMonitoring
 
     private
 
-    attr_accessor(:usage_data, :superseeding_rack_application)
+    attr_accessor(:usage_data, :app)
   end
 end
