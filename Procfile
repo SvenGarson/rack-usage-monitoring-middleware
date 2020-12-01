@@ -1,1 +1,1 @@
-web: bundler exec puma -e ${RACK_ENV:-deployment}
+web: bundler exec puma -p $PORT
